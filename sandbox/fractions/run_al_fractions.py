@@ -5,6 +5,7 @@ import apprentice
 from apprentice.working_memory.representation import Sai
 from apprentice.working_memory.numba_operators import *
 
+from tutorenvs.fractions_v_add_only import FractionArithSymbolic as FractionArithSymbolicJustAdd
 from tutorenvs.fractions_v import FractionArithSymbolic
 from tutorenvs.utils import DataShopLogger
 from colorama import Back, Fore
@@ -14,10 +15,19 @@ from tutorenvs.utils import compare
 
 import time
 
-def run_training(agent, logger_name='FractionAddition', n=10, n_fracs=3, use_foci=False):
+def run_training(agent, typ='arith', logger_name=None, n=10, n_fracs=3, use_foci=False):
     logger = DataShopLogger(logger_name, extra_kcs=['field'])
 
-    env = FractionArithSymbolic(logger=logger, n=n_fracs)
+
+    if(typ == "addition"):
+        if(logger_name is None): logger_name = "FractionAddition"
+        env = FractionArithSymbolicJustAdd(logger=logger, n=n_fracs)
+    elif(typ == "arith"):
+        if(logger_name is None): logger_name = "FractionArith"
+        env = FractionArithSymbolic(logger=logger, n=n_fracs)
+    else:
+        raise ValueError(f"Unrecognized type {typ}")
+
     ALWAYS_UPDATE_STATE = False
     SEND_NEXT_STATE = True
 
@@ -93,12 +103,18 @@ if __name__ == "__main__":
     parser.add_argument('--agent-type', default='DIPL',metavar="<agent_type>",
                         dest="agent_type", help="type of agents DIPL or RHS_LHS")
 
+    parser.add_argument('-t', default='addition',metavar="<env_type>",
+                        dest="env_type", help="'arith' (i.e. mult & addition) or 'addition'")
+
     args = parser.parse_args(sys.argv[1:])
 
 
     function_set = ['RipFloatValue',
                     'Add',
                     'Multiply',
+
+                    # "Numerator_Multiply_symb",
+                    # "Cross_Multiply_symb",
                     'Subtract',
                     'ConvertNumerator',
                     # 'Divide',
@@ -122,7 +138,7 @@ if __name__ == "__main__":
             strip_attrs=["to_left","to_right","above","below","type","id","offsetParent", "dom_class"]
                 )
 
-    logger_name = f'frac_addition_{args.agent_type}_{args.n_fracs}frac_{args.n_problems}probs'
+    logger_name = f'frac_{args.env_type}_{args.agent_type}_{args.n_fracs}frac_{args.n_problems}probs'
     for _ in range(args.n_agents):
         if(args.agent_type.upper() == "DIPL"):
             agent = ModularAgent(**agent_args)
@@ -131,7 +147,7 @@ if __name__ == "__main__":
         else:
             raise ValueError(f"Unrecognized agent type {args.agent_type!r}.")
 
-        run_training(agent, logger_name=logger_name,  n=int(args.n_problems), n_fracs=args.n_fracs)
+        run_training(agent, args.env_type, logger_name=logger_name,  n=int(args.n_problems), n_fracs=args.n_fracs)
 
 
     # for i in range(100):

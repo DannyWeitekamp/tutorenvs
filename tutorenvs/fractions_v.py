@@ -60,8 +60,8 @@ class FractionArithSymbolic:
                    {'value': str(reduce(operator.mul, init_denoms))})
             fsm.add_next_state(sai, foci)
 
-            foci = [*["initial_num_{}".format(i) for i in range(self.n)],
-                    *["initial_denom_{}".format(i) for i in range(self.n)]]
+            foci = ["initial_num_{}".format(i) for i in range(self.n)]
+                    #*["initial_denom_{}".format(i) for i in range(self.n)]]
             sai = ('answer_num', 'UpdateField', 
                    {'value': str(reduce(operator.mul, init_nums))})
             fsm.add_next_state(sai, foci)
@@ -72,8 +72,8 @@ class FractionArithSymbolic:
                    {'value': str(self.state['initial_denom_0'])})
             fsm.add_next_state(sai, foci)
 
-            foci = [*["initial_num_{}".format(i) for i in range(self.n)],
-                    *["initial_denom_{}".format(i) for i in range(self.n)]]
+            foci = ["initial_num_{}".format(i) for i in range(self.n)]
+                    #*["initial_denom_{}".format(i) for i in range(self.n)]]
             sai = ('answer_num', 'UpdateField', 
                    {'value': str(sum(init_nums))})
             fsm.add_next_state(sai, foci)
@@ -114,7 +114,7 @@ class FractionArithSymbolic:
             sai = ('answer_denom', 'UpdateField', {'value': str(convert_denom)})
             fsm.add_next_state(sai, foci)
 
-        foci = ['answer_num', 'answer_denom']
+        foci = []
         sai = ('done', "ButtonPressed", {'value': -1})
         fsm.add_next_state(sai, foci)
 
@@ -282,10 +282,10 @@ class FractionArithSymbolic:
             nums = [str(randint(1, 15)) for _ in range(self.n)]
             denoms = [str(randint(2, 15)) for _ in range(self.n)]
             ok = (not any(np.array(nums)==np.array(denoms))) and (len(set(denoms)) > 1)
-        operator = "+"#choice(['+', '*'])
+        operator = choice(['+', '*'])
         self.set_problem(nums, denoms, operator)
 
-        print(Back.WHITE + Fore.BLACK + f"STARTING PROBLEM {'+'.join([f'({n}/{v})' for n,v in zip(nums,denoms)])}" )
+        print(Back.WHITE + Fore.BLACK + f"STARTING PROBLEM {operator.join([f'({n}/{v})' for n,v in zip(nums,denoms)])}" )
 
     def set_problem(self, nums, denoms, operator):
         self.reset(nums, denoms, operator)
